@@ -26,7 +26,7 @@ namespace Insthync.UnityEditorUtils.Editor
         private bool GetShowResult(T attribute, SerializedProperty property)
         {
             var propertyPath = property.propertyPath;
-            var conditionPath = propertyPath.Replace(property.name, attribute.conditionFieldName);
+            var conditionPath = propertyPath.Substring(0, propertyPath.Length - property.name.Length) + attribute.conditionFieldName;
             var sourcePropertyValue = property.serializedObject.FindProperty(conditionPath);
             return attribute.GetShowResult(sourcePropertyValue);
         }
