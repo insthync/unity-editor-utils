@@ -14,11 +14,13 @@ namespace Insthync.UnityEditorUtils
     {
         public readonly string methodName;
         public readonly string labelText;
+        public readonly bool dirtyAfterPressed;
 
-        public InspectorButtonAttribute(string methodName, string labelText = "")
+        public InspectorButtonAttribute(string methodName, string labelText = "", bool dirtyAfterPressed = true)
         {
             this.methodName = methodName;
             this.labelText = labelText;
+            this.dirtyAfterPressed = dirtyAfterPressed;
         }
     }
 }

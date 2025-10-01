@@ -36,6 +36,8 @@ namespace Insthync.UnityEditorUtils.Editor
                 {
                     Debug.LogWarning(string.Format("InspectorButton: Unable to find method {0} in {1}", eventName, eventOwnerType));
                 }
+                if (inspectorButtonAttribute.dirtyAfterPressed)
+                    EditorUtility.SetDirty(prop.serializedObject.targetObject);
             }
         }
 
