@@ -8,26 +8,26 @@ namespace Insthync.UnityEditorUtils.Editor
     /// Modified from codes in Wiki: http://wiki.unity3d.com/index.php/FindMissingScripts 
     /// Modified by Insthync
     /// </summary>
-    public abstract class BaseFindMissingObjectsRecursively : EditorWindow
+    public abstract class BaseFindObjectsRecursivelyTool : EditorWindow
     {
-        protected struct MissingObjectData
+        protected struct FoundObjectData
         {
             public GameObject Object { get; set; }
             public int ComponentIndex { get; set; }
         }
 
-        int _searchedCount = 0;
-        int _componentsCount = 0;
-        int _missingCount = 0;
-        Vector2 _scrollPos = Vector2.zero;
-        List<MissingObjectData> _missingObjects = new List<MissingObjectData>();
+        protected int _searchedCount = 0;
+        protected int _componentsCount = 0;
+        protected int _missingCount = 0;
+        protected Vector2 _scrollPos = Vector2.zero;
+        protected List<FoundObjectData> _missingObjects = new List<FoundObjectData>();
 
         public abstract string GetObjectName();
 
-        public void OnGUI()
+        protected virtual void OnGUI()
         {
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button($"Find missing {GetObjectName()} in selected GameObjects"))
+            if (GUILayout.Button($"Find {GetObjectName()} in selected GameObjects"))
             {
                 FindInSelected();
             }
@@ -44,7 +44,7 @@ namespace Insthync.UnityEditorUtils.Editor
                 GUILayout.EndHorizontal();
             }
             GUILayout.BeginHorizontal();
-            GUILayout.Label(string.Format("Searched {0} GameObjects, {1} components, found {2} missing", _searchedCount, _componentsCount, _missingCount));
+            GUILayout.Label(string.Format("Searched {0} GameObjects, {1} components, found {2} objects", _searchedCount, _componentsCount, _missingCount));
             GUILayout.EndHorizontal();
             GUILayout.EndScrollView();
         }
@@ -58,21 +58,21 @@ namespace Insthync.UnityEditorUtils.Editor
             _missingObjects.Clear();
             foreach (GameObject g in go)
             {
-                FindInGO(g);
+                FindInGameObject(g);
             }
-            Debug.Log(string.Format("Searched {0} GameObjects, {1} components, found {2} missing", _searchedCount, _componentsCount, _missingCount));
+            Debug.Log(string.Format("Searched {0} GameObjects, {1} components, found {2} objects", _searchedCount, _componentsCount, _missingCount));
         }
 
-        protected abstract bool IsObjectEmpty(Component comp);
+        protected abstract bool IsTargetObject(Component comp);
 
-        private void FindInGO(GameObject obj)
+        private void FindInGameObject(GameObject obj)
         {
             _searchedCount++;
             Component[] components = obj.GetComponents<Component>();
             for (int idx = 0; idx < components.Length; idx++)
             {
                 _componentsCount++;
-                if (IsObjectEmpty(components[idx]))
+                if (IsTargetObject(components[idx]))
                 {
                     _missingCount++;
                     string path = obj.name;
@@ -82,8 +82,8 @@ namespace Insthync.UnityEditorUtils.Editor
                         path = t.parent.name + "/" + path;
                         t = t.parent;
                     }
-                    Debug.Log($"{path} has an empty {GetObjectName()} attached in position: {idx}", obj);
-                    _missingObjects.Add(new MissingObjectData()
+                    Debug.Log($"{path} has an {GetObjectName()} attached in position: {idx}", obj);
+                    _missingObjects.Add(new FoundObjectData()
                     {
                         Object = obj,
                         ComponentIndex = idx,
@@ -92,9 +92,9 @@ namespace Insthync.UnityEditorUtils.Editor
             }
 
             // Now recurse through each child GO (if there are any):
-            foreach (Transform childT in obj.transform)
+            foreach (Transform childTransform in obj.transform)
             {
-                FindInGO(childT.gameObject);
+                FindInGameObject(childTransform.gameObject);
             }
         }
     }

@@ -3,9 +3,9 @@ using UnityEditor;
 
 namespace Insthync.UnityEditorUtils.Editor
 {
-    public class FindMissingScriptsRecursively : BaseFindMissingObjectsRecursively
+    public class FindMissingScriptsRecursively : BaseFindObjectsRecursivelyTool
     {
-        [MenuItem("Window/FindMissingScriptsRecursively")]
+        [MenuItem("Window/Object Finding Tools/Find Missing Scripts")]
         public static void ShowWindow()
         {
             GetWindow(typeof(FindMissingScriptsRecursively));
@@ -13,10 +13,10 @@ namespace Insthync.UnityEditorUtils.Editor
 
         public override string GetObjectName()
         {
-            return "script(s)";
+            return "missing script(s)";
         }
 
-        protected override bool IsObjectEmpty(Component comp)
+        protected override bool IsTargetObject(Component comp)
         {
             return comp == null;
         }
