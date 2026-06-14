@@ -10,13 +10,13 @@ namespace Insthync.UnityEditorUtils.Editor
     {
         public const string UNCATEGORIZED_HEADER = "Uncategorized";
         public const int UNCATEGORIZED_ORDER = -10000;
-        protected Dictionary<string, CategoryData> categorizedProperties;
+        private Dictionary<string, CategoryData> _categorizedProperties;
         protected static readonly Dictionary<string, bool> ShowStates = new Dictionary<string, bool>();
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            categorizedProperties = new Dictionary<string, CategoryData>();
+            _categorizedProperties = new Dictionary<string, CategoryData>();
             SerializedProperty property = serializedObject.GetIterator();
             PrepareFields(property);
         }
@@ -34,18 +34,18 @@ namespace Insthync.UnityEditorUtils.Editor
                     {
                         // Uncategorized
                         lastHeader = UNCATEGORIZED_HEADER;
-                        tempCategoryData = CreateOrGetCategoryData(categorizedProperties, lastHeader, UNCATEGORIZED_ORDER, false);
+                        tempCategoryData = CreateOrGetCategoryData(_categorizedProperties, lastHeader, UNCATEGORIZED_ORDER, false);
                     }
                     else if (category != null)
                     {
                         // Categorized by header
                         lastHeader = category.category;
-                        tempCategoryData = CreateOrGetCategoryData(categorizedProperties, lastHeader, category.order, category.isFoldoutByDefault);
+                        tempCategoryData = CreateOrGetCategoryData(_categorizedProperties, lastHeader, category.order, category.isFoldoutByDefault);
                     }
                     else
                     {
                         // Get category data by previous header
-                        tempCategoryData = CreateOrGetCategoryData(categorizedProperties, lastHeader, 0, false);
+                        tempCategoryData = CreateOrGetCategoryData(_categorizedProperties, lastHeader, 0, false);
                     }
                     tempCategoryData.PropertyPaths.Add(obj.propertyPath);
                 } while (obj.NextVisible(false));
@@ -55,7 +55,7 @@ namespace Insthync.UnityEditorUtils.Editor
         protected override void RenderFields()
         {
             // Sort category by order
-            List<CategoryData> categorizedPropertiesValues = new List<CategoryData>(categorizedProperties.Values);
+            List<CategoryData> categorizedPropertiesValues = new List<CategoryData>(_categorizedProperties.Values);
             categorizedPropertiesValues.Sort();
             foreach (CategoryData categoryData in categorizedPropertiesValues)
             {

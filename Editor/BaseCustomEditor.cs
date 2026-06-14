@@ -15,17 +15,17 @@ namespace Insthync.UnityEditorUtils.Editor
         /// <summary>
         /// Field names in this list will be hidden
         /// </summary>
-        protected List<string> hiddenFields;
+        protected List<string> _hiddenFields = new List<string>();
 
         /// <summary>
         /// Dictionary<ShowingFieldName(string), List<FieldCondition>>
         /// </summary>
-        protected Dictionary<string, List<FieldCondition>> fieldConditions;
+        protected Dictionary<string, List<FieldCondition>> _fieldConditions = new Dictionary<string, List<FieldCondition>>();
 
         protected virtual void OnEnable()
         {
-            hiddenFields = new List<string>();
-            fieldConditions = new Dictionary<string, List<FieldCondition>>();
+            _hiddenFields.Clear();
+            _fieldConditions.Clear();
             SetFieldCondition();
         }
 
@@ -108,9 +108,9 @@ namespace Insthync.UnityEditorUtils.Editor
 
         private void AddFieldCondition(string showingFieldName, FieldCondition condition)
         {
-            if (!fieldConditions.ContainsKey(showingFieldName))
-                fieldConditions.Add(showingFieldName, new List<FieldCondition>());
-            fieldConditions[showingFieldName].Add(condition);
+            if (!_fieldConditions.ContainsKey(showingFieldName))
+                _fieldConditions.Add(showingFieldName, new List<FieldCondition>());
+            _fieldConditions[showingFieldName].Add(condition);
         }
 
         public override void OnInspectorGUI()
@@ -144,15 +144,15 @@ namespace Insthync.UnityEditorUtils.Editor
 
         protected virtual bool FieldShouldVisible(SerializedProperty obj)
         {
-            if (hiddenFields.Contains(obj.name))
+            if (_hiddenFields.Contains(obj.name))
             {
                 // The field is being hidden
                 return false;
             }
-            if (fieldConditions.ContainsKey(obj.name))
+            if (_fieldConditions.ContainsKey(obj.name))
             {
                 bool shouldVisible = false;
-                foreach (var condition in fieldConditions[obj.name])
+                foreach (var condition in _fieldConditions[obj.name])
                 {
                     if (condition.ShouldVisible(target, obj))
                     {
