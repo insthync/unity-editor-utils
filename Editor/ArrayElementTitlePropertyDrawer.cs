@@ -11,10 +11,10 @@ namespace Insthync.UnityEditorUtils.Editor
             get { return (ArrayElementTitleAttribute)attribute; }
         }
 
-        private SerializedProperty titleProperty;
-        private bool isNull;
-        private Color changingColor;
-        private GUIStyle style;
+        private SerializedProperty _titleProperty;
+        private bool _isNull;
+        private Color _changingColor;
+        private GUIStyle _style;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -23,10 +23,7 @@ namespace Insthync.UnityEditorUtils.Editor
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            string variablePropertyPath = property.propertyPath + "." + Attribute.variableName;
-            titleProperty = property.serializedObject.FindProperty(variablePropertyPath);
-            isNull = false;
-            string newlabel = GetTitle();
+            string newlabel = GetTitle(property);
             if (string.IsNullOrEmpty(newlabel))
             {
                 // Element 0, Element 1, Element 2, ... Element N
@@ -41,10 +38,10 @@ namespace Insthync.UnityEditorUtils.Editor
                     newlabel = $"      {newlabel}";
             }
 
-            changingColor = isNull ? Attribute.nullColor : Attribute.notNullColor;
-            style = SetStyleColor(new GUIStyle(), changingColor);
+            _changingColor = _isNull ? Attribute.nullColor : Attribute.notNullColor;
+            _style = SetStyleColor(new GUIStyle(), _changingColor);
             EditorGUI.PropertyField(position, property, GUIContent.none, true);
-            EditorGUI.LabelField(position, new GUIContent(newlabel, label.tooltip), style);
+            EditorGUI.LabelField(position, new GUIContent(newlabel, label.tooltip), _style);
         }
 
         private GUIStyle SetStyleColor(GUIStyle style, Color color)
@@ -60,39 +57,42 @@ namespace Insthync.UnityEditorUtils.Editor
             return style;
         }
 
-        private string GetTitle()
+        private string GetTitle(SerializedProperty property)
         {
-            if (titleProperty == null)
+            string variablePropertyPath = property.propertyPath + "." + Attribute.variableName;
+            _titleProperty = property.serializedObject.FindProperty(variablePropertyPath);
+            _isNull = false;
+            if (_titleProperty == null)
                 return string.Empty;
-            switch (titleProperty.propertyType)
+            switch (_titleProperty.propertyType)
             {
                 case SerializedPropertyType.Generic:
                     break;
                 case SerializedPropertyType.Integer:
-                    return titleProperty.intValue.ToString();
+                    return _titleProperty.intValue.ToString();
                 case SerializedPropertyType.Boolean:
-                    return titleProperty.boolValue.ToString();
+                    return _titleProperty.boolValue.ToString();
                 case SerializedPropertyType.Float:
-                    return titleProperty.floatValue.ToString();
+                    return _titleProperty.floatValue.ToString();
                 case SerializedPropertyType.String:
                     break;
                 case SerializedPropertyType.Color:
-                    return titleProperty.colorValue.ToString();
+                    return _titleProperty.colorValue.ToString();
                 case SerializedPropertyType.ObjectReference:
-                    if (titleProperty.objectReferenceValue != null)
-                        return titleProperty.objectReferenceValue.name;
-                    isNull = true;
+                    if (_titleProperty.objectReferenceValue != null)
+                        return _titleProperty.objectReferenceValue.name;
+                    _isNull = true;
                     return "None";
                 case SerializedPropertyType.LayerMask:
                     break;
                 case SerializedPropertyType.Enum:
-                    return titleProperty.enumNames[titleProperty.enumValueIndex];
+                    return _titleProperty.enumNames[_titleProperty.enumValueIndex];
                 case SerializedPropertyType.Vector2:
-                    return titleProperty.vector2Value.ToString();
+                    return _titleProperty.vector2Value.ToString();
                 case SerializedPropertyType.Vector3:
-                    return titleProperty.vector3Value.ToString();
+                    return _titleProperty.vector3Value.ToString();
                 case SerializedPropertyType.Vector4:
-                    return titleProperty.vector4Value.ToString();
+                    return _titleProperty.vector4Value.ToString();
                 case SerializedPropertyType.Rect:
                     break;
                 case SerializedPropertyType.ArraySize:
